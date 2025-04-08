@@ -36,13 +36,13 @@
 
 ---
 
-## 🎬 Video demo (cập nhật sau)
+## 🎬 Video demo
 
-<!-- <p align="center">
-    <a href="">
-        <img src="https://img.youtube.com/vi/b5829JOMk28/maxresdefault.jpg" alt="Xem video demo">
+<p align="center">
+    <a href="https://youtu.be/h1Wwye3FNes">
+        <img src="https://img.youtube.com/vi/h1Wwye3FNes/maxresdefault.jpg" alt="Xem video demo">
     </a>
-</p> -->
+</p>
 
 ---
 
