@@ -1373,7 +1373,7 @@ class BrowserManager:                                                           
 
                     print(f"0. ALL ({len(profile_list)})") if len(profile_list) > 1 else None
                     for idx, profile in enumerate(profile_list, start=1):
-                        print(f"{idx}. {profile['profile_name'] if choice in ('1', '2') else profile}{' [✓]' if profile['profile_name'] in user_data_profiles else ''}")
+                        print(f"{idx}. {profile['profile_name'] if choice in ('1', '2') else profile}{' [✓]' if choice in ('1', '2') and profile['profile_name'] in user_data_profiles else ''}")
 
                     profile_choice = input(
                         "Nhập số và cách nhau bằng dấu cách (nếu chọn nhiều) hoặc bất kì để quay lại: ")
