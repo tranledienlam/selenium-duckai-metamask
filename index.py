@@ -172,7 +172,7 @@ class Auto:
                         return False
             
             if self.node.find(By.XPATH, '//div[contains(text(),"reached your daily AIQ limit")]', timeout=10):
-                self.node.log('Đã đạt giới hạn AIQ hàng ngày')
+                self.node.snapshot('Đã đạt giới hạn AIQ hàng ngày')
                 return False
 
         else:
