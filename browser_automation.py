@@ -227,8 +227,8 @@ class Node:
             self.new_tab(url="https://www.google.com")
         '''
 
-        timeout = timeout if timeout else self.timeout
-        wait = wait if wait else self.wait
+        timeout = timeout if timeout or timeout == 0 else self.timeout
+        wait = wait if wait or wait == 0 else self.wait
 
         Utility.wait_time(wait)
 
@@ -260,8 +260,8 @@ class Node:
                 - `True`: nếu trang tải thành công.
                 - `False`: nếu có lỗi xảy ra trong quá trình tải trang.
         '''
-        timeout = timeout if timeout else self.timeout
-        wait = wait if wait else self.wait
+        timeout = timeout if timeout or timeout == 0 else self.timeout
+        wait = wait if wait or wait == 0 else self.wait
         methods = ['script', 'get']
         Utility.wait_time(wait)
         if method not in methods:
@@ -295,7 +295,7 @@ class Node:
         Returns:
             Chuỗi str URL hiện tại
         '''
-        wait = wait if wait else self.wait
+        wait = wait if wait or wait == 0 else self.wait
 
         Utility.wait_time(wait, True)
         return self._driver.current_url
@@ -316,8 +316,8 @@ class Node:
                 - WebElement: nếu tìm thấy phần tử.
                 - `None`: nếu không tìm thấy hoặc xảy ra lỗi.
         '''
-        timeout = timeout if timeout else self.timeout
-        wait = wait if wait else self.wait
+        timeout = timeout if timeout or timeout == 0 else self.timeout
+        wait = wait if wait or wait == 0 else self.wait
         Utility.wait_time(wait)
         try:
             search_context = parent_element if parent_element else self._driver
@@ -352,8 +352,8 @@ class Node:
         Returns:
             list[WebElement]: Danh sách các phần tử tìm thấy.
         '''
-        timeout = timeout if timeout else self.timeout
-        wait = wait if wait else self.wait
+        timeout = timeout if timeout or timeout == 0 else self.timeout
+        wait = wait if wait or wait == 0 else self.wait
         Utility.wait_time(wait)
 
         try:
@@ -385,8 +385,8 @@ class Node:
         Returns:
             WebElement | None: Trả về phần tử cuối cùng nếu tìm thấy, ngược lại trả về None.
         '''
-        timeout = timeout if timeout else self.timeout
-        wait = wait if wait else self.wait
+        timeout = timeout if timeout or timeout == 0 else self.timeout
+        wait = wait if wait or wait == 0 else self.wait
         Utility.wait_time(wait)
 
         if not isinstance(selectors, list) or len(selectors) < 2:
@@ -465,8 +465,8 @@ class Node:
             - Nếu gặp lỗi, sẽ ghi lại thông báo lỗi cụ thể.
             - Nếu gặp lỗi liên quan đến Javascript (LavaMoat), phương thức sẽ thử lại bằng cách tìm phần tử theo cách khác.
         '''
-        timeout = timeout if timeout else self.timeout
-        wait = wait if wait else self.wait
+        timeout = timeout if timeout or timeout == 0 else self.timeout
+        wait = wait if wait or wait == 0 else self.wait
 
         try:
             search_context = parent_element if parent_element else self._driver
@@ -539,8 +539,8 @@ class Node:
             - Nếu gặp lỗi, sẽ ghi lại thông báo lỗi cụ thể.
             - Nếu gặp lỗi liên quan đến Javascript (LavaMoat), phương thức sẽ thử lại bằng cách tìm phần tử theo cách khác.
         '''
-        timeout = timeout if timeout else self.timeout
-        wait = wait if wait else self.wait
+        timeout = timeout if timeout or timeout == 0 else self.timeout
+        wait = wait if wait or wait == 0 else self.wait
 
         try:
             search_context = parent_element if parent_element else self._driver
@@ -602,8 +602,8 @@ class Node:
             element = node.find(By.ID, 'search')
             node.press_key('Tab', parent_element=element)
         '''
-        timeout = timeout if timeout else self.timeout
-        wait = wait if wait else self.wait
+        timeout = timeout if timeout or timeout == 0 else self.timeout
+        wait = wait if wait or wait == 0 else self.wait
         
         try:
             Utility.wait_time(wait)
@@ -653,8 +653,8 @@ class Node:
             - Nếu phần tử chứa văn bản, phương thức trả về văn bản đó và ghi log thông báo thành công.
             - Nếu gặp lỗi liên quan đến Javascript (LavaMoat), phương thức sẽ thử lại bằng cách tìm phần tử theo cách khác.
         '''
-        timeout = timeout if timeout else self.timeout
-        wait = wait if wait else self.wait
+        timeout = timeout if timeout or timeout == 0 else self.timeout
+        wait = wait if wait or wait == 0 else self.wait
 
         try:
             search_context = parent_element if parent_element else self._driver
@@ -699,8 +699,8 @@ class Node:
             bool: True nếu tìm thấy và chuyển đổi thành công, False nếu không.
         '''
         types = ['title', 'url']
-        timeout = timeout if timeout else self.timeout
-        wait = wait if wait else self.wait
+        timeout = timeout if timeout or timeout == 0 else self.timeout
+        wait = wait if wait or wait == 0 else self.wait
         found = False
 
         if type not in types:
@@ -764,7 +764,7 @@ class Node:
         Args:
             wait (int, optional): Thời gian chờ trước khi thực hiện reload, mặc định sử dụng giá trị `self.wait = 3`.
         '''
-        wait = wait if wait else self.wait
+        wait = wait if wait or wait == 0 else self.wait
 
         Utility.wait_time(wait)
         try:
@@ -789,8 +789,8 @@ class Node:
             bool: True nếu đóng tab thành công, False nếu không.
         '''
 
-        timeout = timeout if timeout else self.timeout
-        wait = wait if wait else self.wait
+        timeout = timeout if timeout or timeout == 0 else self.timeout
+        wait = wait if wait or wait == 0 else self.wait
 
         current_handle = self._driver.current_window_handle
         all_handles = self._driver.window_handles
@@ -846,7 +846,7 @@ class Node:
         Mô tả:
             Phương thức sẽ nhận vào 1 element cụ thể, sau đó dùng driver.execute_script() để thực thi script
         '''
-        timeout = timeout if timeout else self.timeout
+        timeout = timeout if timeout or timeout == 0 else self.timeout
         Utility.wait_time(wait)
         
         try:

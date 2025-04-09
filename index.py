@@ -135,7 +135,7 @@ class Auto:
                 (By.CSS_SELECTOR, '[name="MetaMask"]')
             ]
             meta_wallet = self.node.find_in_shadow(els_shadow)
-            if meta_wallet:
+            if meta_wallet: 
                 meta_wallet.click()
             else:
                 self.node.snapshot('Không tìm thấy nút MetaMask')
@@ -162,18 +162,24 @@ class Auto:
                 self.node.press_key('Enter')
                 
                 # Đợi và xử lý popup MetaMask
-                if self.meta_auto.click_button_popup('button', 'Confirm', timeout=10):
+                if self.meta_auto.click_button_popup('button', 'Confirm'):
+                    self.node.log('Đã confirm MetaMask')
                     # Chuyển về tab chính
                     self.node.switch_tab('https://app.quackai.ai/')
-                    try:
-                        send_button.click()
-                    except:
-                        self.node.log('Không thể click vào nút Send, sau khi Confirm Metamask')
-                        return False
-            
-            if self.node.find(By.XPATH, '//div[contains(text(),"reached your daily AIQ limit")]', timeout=10):
-                self.node.snapshot('Đã đạt giới hạn AIQ hàng ngày')
-                return False
+                else:
+                    self.node.log('Không tìm thấy popup MetaMask để confirm')
+
+            # Kiểm tra daily limit message
+            daily_limit_xpaths = [
+                '//p[contains(text(),"daily") and contains(text(),"limit")]',
+                '//div[contains(text(),"daily") and contains(text(),"limit")]'
+            ]
+            Utility.wait_time(10)
+            for xpath in daily_limit_xpaths:
+                limit_message = self.node.find(By.XPATH, xpath, wait=0, timeout=0)
+                if limit_message:
+                    self.node.snapshot('Đã đạt giới hạn chat hàng ngày')
+                    return False
 
         else:
             self.node.log('Không tìm thấy nút Send')
@@ -195,7 +201,7 @@ class Auto:
                 self.node.snapshot(f'Đã hoàn thành {i}/{times}')
                 return False
         
-        self.node.log(f'Đã hoàn thành {times} lần')
+        self.node.snapshot(f'Đã hoàn thành {times} lần')
         return True
 
 if __name__ == '__main__':
