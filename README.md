@@ -1,4 +1,4 @@
-# AUTOMATION QUACKAI + METAMASK WALLET với Selenium Python
+# AUTOMATION QUACKAI + BIGET WALLET với Selenium Python
 
 ## ⚠ Lưu ý quan trọng
 
@@ -49,14 +49,14 @@
 
 ## 🚀 Chức năng chính
 
-- **Metamask**: Tự động import (nếu có 12 seeds trong data), tự động unlock, chuyển sang duckchain.
+- **Bitget**: Tự động import (nếu có 12 seeds trong data), tự động unlock, chuyển sang duckchain.
 - **Chat với AI**: Tự động gửi chat 5 lần/ngày.
 
 ---
 
 ## 🔧 Yêu cầu ban đầu
 
-- **Metamask**: Nếu không cung cấp 12 seeds trong data, thì phải import sẵn ví bằng cáhc thủ công.
+- **Bitget**: Nếu không cung cấp 12 seeds trong data, thì phải import sẵn ví bằng cáhc thủ công.
 
 ---
 
@@ -67,7 +67,7 @@
 | `extensions/meta-wallet-*.crx` | Tiện ích mở rộng Metamask Wallet.        |
 | `browser_automation.py`        | Code tự động hóa trình duyệt.            |
 | `utils.py`                     | Các hàm hỗ trợ chung.                    |
-| `metamask.py`                  | Xử lý các thao tác liên quan đến Metamask. |
+| `w_bitget.py`                  | Xử lý các thao tác liên quan đến Metamask. |
 | `index.py`                     | File khởi chạy chương trình chính.       |
 | `requirements.txt`             | Danh sách các thư viện cần thiết.        |
 | `intro.jpg`                    | Hình ảnh giới thiệu.                     |

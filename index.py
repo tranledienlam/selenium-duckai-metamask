@@ -4,7 +4,7 @@ from selenium.webdriver.common.by import By
 
 from browser_automation import BrowserManager, Node
 from utils import Utility
-from metamask import Auto as MetaAuto, Setup as MetaSetup, EXTENSION_URL
+from w_bitget import Auto as BitgetAuto, Setup as BitgetSetup, EXTENSION_URL
 
 QUESTIONS = [
     "What is artificial intelligence?",
@@ -101,11 +101,11 @@ class Setup:
     def __init__(self, node: Node, profile) -> None:
         self.node = node
         self.profile = profile
-        self.meta_setup = MetaSetup(node, profile)
+        self.bitget_setup = BitgetSetup(node, profile)
 
     def _run(self):
-        self.meta_setup._run()
-        self.node.new_tab('https://app.quackai.ai/quackipedia?inviterCode=hj7kay&')
+        self.bitget_setup._run()
+        self.node.new_tab('https://app.quackai.ai')#quackipedia?inviterCode=hj7kay&
 
 class Auto:
     def __init__(self, node: Node, profile: dict) -> None:
@@ -114,61 +114,62 @@ class Auto:
         self.profile_name = profile.get('profile_name')
         self.password = profile.get('password')
         self.seeds = profile.get('seeds')
-        self.meta_auto = MetaAuto(node, profile)
+        self.bitget_auto = BitgetAuto(node, profile)
+        self.click_first = True
 
     def connect_wallet(self):
         text_button = self.node.get_text(By.XPATH, '//button[contains(@class, "whitespace-nowrap")]')
         if '...' in text_button:
-            self.node.log('Đã connect wallet')
+            if self.node.find(By.XPATH, '//div[contains(text(), "Invite to Earn")]'):
+                self.node.log('Đã connect wallet')
+                return True
+            else:
+                self.node.snapshot(f'Cần Connect bằng tay')
         elif 'Connect Wallet' in text_button:
             self.node.find_and_click(By.XPATH, '//button[contains(text(),"Connect Wallet")]')
-            els_shadow = [
-                (By.CSS_SELECTOR, "w3m-modal.open"),
-                (By.CSS_SELECTOR, "w3m-router"),
-                (By.CSS_SELECTOR, "w3m-connect-view"),
-                (By.CSS_SELECTOR, "w3m-wallet-login-list"),
-                # lần đầu tiên click vào nút connect sẽ hiện ra danh sách các wallet
-                (By.CSS_SELECTOR, 'w3m-connector-list'),
-                # lần click vào nút connect sẽ hiện ra danh sách các wallet
-                # (By.CSS_SELECTOR, 'w3m-connect-injected-widget'),
-                (By.CSS_SELECTOR, "w3m-connect-announced-widget"),
-                (By.CSS_SELECTOR, '[name="MetaMask"]')
-            ]
-            meta_wallet = self.node.find_in_shadow(els_shadow)
-            if meta_wallet: 
-                meta_wallet.click()
-            else:
-                self.node.snapshot('Không tìm thấy nút MetaMask')
-                return False
-
-            self.meta_auto.click_button_popup('button', 'Connect')
-            self.meta_auto.click_button_popup('button', 'Confirm')
+            self.node.find_and_click(By.XPATH, '//div[contains(text(), "Bitget Wallet")]')
+            self.bitget_auto.confirm('connect')
+            self.bitget_auto.confirm('approve')
+            return self.connect_wallet()
         else:
-            self.node.snapshot('connect_wallet bị lỗi không xác định')
             return False
-        
-        return True
-    
+
+    def handle_popup(self):
+        h2_els = self.node.find_all(By.XPATH, '//div[h2]')
+        popup = None
+        for h2 in h2_els:
+            if 'Get Started with Quack AI'.lower() in h2.text.lower():
+                popup = h2
+        if popup:
+            buttons = self.node.find_all(By.TAG_NAME, 'button', popup)
+            for button in buttons:
+                if 'GO'.lower() in button.text.lower():
+                    button.click()
+                    if self.click_first:
+                        if self.bitget_auto.confirm('Agree'):
+                            self.click_first = False
+                            button.click()
+                    self.node.switch_tab('https://app.quackai.ai')
+            self.node.find_and_click(By.XPATH, '//button[contains(text(), "Start Chatting")]')
+
     def send_message(self):
         send_button = self.node.find(By.XPATH, '//div[div[contains(text(),"Send")]]')
+        question = random.choice(QUESTIONS)
         # Kiểm tra trạng thái nút Send
         if send_button:
             # Nếu nút bị disable (có class pointer-events-none)
-            if 'pointer-events-none' in send_button.get_attribute('class'):
-                self.node.find_and_input(By.TAG_NAME, 'input', random.choice(QUESTIONS))
+            if 'cursor-not-allowed' in send_button.get_attribute('class'):
+                self.node.find_and_input(By.TAG_NAME, 'textarea', question)
                 send_button = self.node.find(By.XPATH, '//div[div[contains(text(),"Send")]]')
             # Nếu nút đang active (có class cursor-pointer)
             if 'cursor-pointer' in send_button.get_attribute('class'):
                 self.node.press_key('Enter')
                 
                 # Đợi và xử lý popup MetaMask
-                if self.meta_auto.click_button_popup('button', 'Confirm'):
-                    self.node.log('Đã confirm MetaMask')
-                    # Chuyển về tab chính
-                    self.node.switch_tab('https://app.quackai.ai/')
-                else:
-                    self.node.log('Không tìm thấy popup MetaMask để confirm')
-
+                if self.click_first:
+                    self.bitget_auto.confirm('Agree')
+                    self.click_first = False
+                
             # Kiểm tra daily limit message
             daily_limit_xpaths = [
                 '//p[contains(text(),"daily") and contains(text(),"limit")]',
@@ -178,7 +179,8 @@ class Auto:
             for xpath in daily_limit_xpaths:
                 limit_message = self.node.find(By.XPATH, xpath, wait=0, timeout=0)
                 if limit_message:
-                    self.node.snapshot('Đã đạt giới hạn chat hàng ngày')
+                    point = self.node.get_text(By.XPATH, '//span[contains(@class, "font-[Poppins]")]')
+                    self.node.snapshot(f'Đã đạt giới hạn chat hàng ngày: {point}')
                     return False
 
         else:
@@ -188,21 +190,17 @@ class Auto:
         return True
     
     def _run(self):
-        self.meta_auto._run()
-        self.meta_auto.change_network('Duck chain', 'https://rpc.duckchain.io', '5545', 'TON', 'https://scan.duckchain.io/')
-        self.node.go_to('https://app.quackai.ai/quackipedia?inviterCode=hj7kay&')
+        self.bitget_auto._run()
+        self.bitget_auto.change_network('Duck chain', 'https://rpc.duckchain.io', '5545', 'TON', 'https://scan.duckchain.io/')
+        self.node.new_tab('https://app.quackai.ai/')
 
         if not self.connect_wallet():
             return False
-
-        times = 5
-        for i in range(times):
-            if not self.send_message():
-                self.node.snapshot(f'Đã hoàn thành {i}/{times}')
-                return False
         
-        self.node.snapshot(f'Đã hoàn thành {times} lần')
-        return True
+        self.handle_popup()
+        while True:
+            if not self.send_message():
+                break
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -217,12 +215,12 @@ if __name__ == '__main__':
         exit()
 
     browser_manager = BrowserManager(AutoHandlerClass=Auto, SetupHandlerClass=Setup)
-    browser_manager.config_extension('meta-wallet-*.crx')
+    browser_manager.config_extension('Bitget-Wallet-*.crx')
     # browser_manager.run_browser(profiles[1])
     browser_manager.run_terminal(
         profiles=profiles,
         max_concurrent_profiles=4,
-        block_media=True,
+        block_media=False,
         auto=args.auto,
         headless=args.headless,
         disable_gpu=args.disable_gpu,
