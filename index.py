@@ -159,7 +159,7 @@ class Auto:
         if send_button:
             # Nếu nút bị disable (có class pointer-events-none)
             if 'cursor-not-allowed' in send_button.get_attribute('class'):
-                self.node.find_and_input(By.TAG_NAME, 'textarea', question)
+                self.node.find_and_input(By.XPATH, '//textarea[@rows]', question)
                 send_button = self.node.find(By.XPATH, '//div[div[contains(text(),"Send")]]')
             # Nếu nút đang active (có class cursor-pointer)
             if 'cursor-pointer' in send_button.get_attribute('class'):
@@ -179,7 +179,12 @@ class Auto:
             for xpath in daily_limit_xpaths:
                 limit_message = self.node.find(By.XPATH, xpath, wait=0, timeout=0)
                 if limit_message:
-                    point = self.node.get_text(By.XPATH, '//span[contains(@class, "font-[Poppins]")]')
+                    point = 0
+                    point_el = self.node.find(By.XPATH, '//span[contains(@class, "font-[Poppins]")]')
+                    if point_el:
+                        point = point_el.text
+                    else:
+                        self.node.log('Không tìm thấy point')
                     self.node.snapshot(f'Đã đạt giới hạn chat hàng ngày: {point}')
                     return False
 
@@ -192,13 +197,15 @@ class Auto:
     def _run(self):
         self.bitget_auto._run()
         self.bitget_auto.change_network('Duck chain', 'https://rpc.duckchain.io', '5545', 'TON', 'https://scan.duckchain.io/')
-        self.node.new_tab('https://app.quackai.ai/')
+        self.node.new_tab('https://app.quackai.ai/quackipedia')
 
         if not self.connect_wallet():
             return False
         
         self.handle_popup()
-        while True:
+        try_send = 10
+        while try_send > 0:
+            try_send -= 1
             if not self.send_message():
                 break
 
@@ -219,7 +226,7 @@ if __name__ == '__main__':
     # browser_manager.run_browser(profiles[1])
     browser_manager.run_terminal(
         profiles=profiles,
-        max_concurrent_profiles=4,
+        max_concurrent_profiles=5,
         block_media=False,
         auto=args.auto,
         headless=args.headless,
