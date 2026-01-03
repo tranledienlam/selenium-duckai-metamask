@@ -1,4 +1,4 @@
-# AUTOMATION QUACKAI + BITGET WALLET với Selenium Python
+# ~~AUTOMATION QUACKAI + BITGET WALLET với Selenium Python~~
 
 ## ⚠ Lưu ý quan trọng
 
